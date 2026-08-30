@@ -8,10 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Laravel sirve desde public/, no desde la raiz.
+# Laravel sirve desde public/, no desde la raiz. AllowOverride All hace
+# falta o Apache ignora el .htaccess y todo lo que no sea / da 404.
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf \
+    && sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf \
     && a2enmod rewrite
 
 WORKDIR /var/www/html
