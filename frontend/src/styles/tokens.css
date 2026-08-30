@@ -1,0 +1,153 @@
+/*
+ * Dos temas sobre el mismo juego de tokens.
+ *
+ * Los nombres describen la FUNCION, no el color: --accent es "la accion
+ * principal", que en modo dia es rojo y en modo noche verde. Asi global.css
+ * no necesita saber en que tema esta.
+ *
+ * Todos los pares texto/fondo cumplen el minimo AA (4.5:1), y 3:1 en los
+ * casos marcados como texto grande.
+ */
+
+/* ================= MODO DIA ================= */
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-base: #eceef4;
+  --bg-image:
+    radial-gradient(ellipse 70% 50% at 100% 0%, rgba(217, 58, 78, 0.09), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 0% 100%, rgba(200, 145, 42, 0.1), transparent 60%);
+
+  --surface: #ffffff;
+  --surface-alt: #f6f7fa;
+  --surface-sunken: #eef0f6;
+
+  --border: #dfe2ec;
+  --border-strong: #c8cddc;
+
+  --text: #24262e;         /* 14.6:1 sobre blanco */
+  --text-muted: #5c6172;   /*  6.2:1 */
+  --text-dim: #6b7185;     /*  4.9:1 — antes 3.1:1, no se leia */
+
+  /* Accion principal: rojo */
+  --accent: #d93a4e;
+  --accent-deep: #b62a3c;
+  --accent-soft: #fdeaed;
+  --accent-line: #e8536a;
+  --accent-glow: rgba(217, 58, 78, 0.3);
+  --on-accent: #ffffff;
+  --overlay-on-accent: rgba(255, 255, 255, 0.18);
+  --overlay-on-accent-strong: rgba(255, 255, 255, 0.32);
+
+  /* Acento secundario: dorado */
+  --gold: #c8912a;         /* solo como fondo solido */
+  --gold-deep: #a87718;
+  --gold-bright: #eab545;
+  --gold-ink: #8a6410;     /*  5.4:1 — version legible sobre blanco */
+  --gold-soft: #fbf1dc;
+  --gold-glow: rgba(200, 145, 42, 0.3);
+  --on-gold: #ffffff;
+
+  /* Placa oscura */
+  --ink: #2b2f3d;
+  --ink-soft: #3d4354;
+  --on-ink: #ffffff;
+  --on-ink-dim: rgba(255, 255, 255, 0.72);
+
+  /* Monedas */
+  --ce: #c62f43;
+  --ce-soft: #fdeaed;
+  --co: #8a6410;
+  --co-soft: #fbf1dc;
+
+  /* Estado */
+  --danger: #c62f43;
+  --danger-soft: #fdeaed;
+  --success: #1f7a52;
+  --success-soft: #e4f4ec;
+
+  /* Podio — texto grande, minimo 3:1 */
+  --podium-1: #b07d13;
+  --podium-2: #727c8e;
+  --podium-3: #a3612f;
+
+  --backdrop: rgba(43, 47, 61, 0.42);
+  --shadow: 0 14px 36px rgba(38, 42, 60, 0.16);
+  --shadow-soft: 0 2px 10px rgba(38, 42, 60, 0.08);
+}
+
+/* ================= MODO NOCHE ================= */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Azul profundo de estadio, con halo mas claro arriba */
+  --bg-base: #0d2647;
+  --bg-image:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(86, 160, 220, 0.4), transparent 62%),
+    radial-gradient(ellipse 60% 50% at 8% 100%, rgba(90, 78, 165, 0.45), transparent 60%),
+    linear-gradient(180deg, #12365e 0%, #0d2647 55%, #0a1c36 100%);
+
+  /* Paneles violeta translucido */
+  --surface: rgba(91, 79, 158, 0.72);
+  --surface-alt: rgba(112, 99, 186, 0.42);
+  --surface-sunken: rgba(30, 46, 84, 0.55);
+
+  --border: rgba(198, 190, 240, 0.32);
+  --border-strong: rgba(198, 190, 240, 0.5);
+
+  --text: #f6f4ff;
+  --text-muted: #d8d5f4;
+  --text-dim: #c0bce6;
+
+  /* Accion principal: el verde de seleccion de la referencia */
+  --accent: #a9dc52;
+  --accent-deep: #93c93c;
+  --accent-soft: rgba(169, 220, 82, 0.2);
+  --accent-line: #bce86f;
+  --accent-glow: rgba(169, 220, 82, 0.32);
+  --on-accent: #16240a;
+  --overlay-on-accent: rgba(0, 0, 0, 0.14);
+  --overlay-on-accent-strong: rgba(0, 0, 0, 0.26);
+
+  --gold: #e8b53f;
+  --gold-deep: #cf9d2c;
+  --gold-bright: #ffd873;
+  --gold-ink: #ffd873;
+  --gold-soft: rgba(232, 181, 63, 0.2);
+  --gold-glow: rgba(232, 181, 63, 0.35);
+  --on-gold: #2b2000;
+
+  /* Placa: azul marino, mas oscura que los paneles */
+  --ink: #16305a;
+  --ink-soft: #1d3d70;
+  --on-ink: #ffffff;
+  --on-ink-dim: rgba(255, 255, 255, 0.72);
+
+  --ce: #ffb3c2;
+  --ce-soft: rgba(255, 179, 194, 0.2);
+  --co: #ffd873;
+  --co-soft: rgba(255, 216, 115, 0.2);
+
+  --danger: #ff9aab;
+  --danger-soft: rgba(255, 154, 171, 0.18);
+  --success: #a9dc52;
+  --success-soft: rgba(169, 220, 82, 0.18);
+
+  --podium-1: #ffd873;
+  --podium-2: #dbe1f5;
+  --podium-3: #f0a26a;
+
+  --backdrop: rgba(6, 18, 38, 0.62);
+  --shadow: 0 18px 44px rgba(4, 12, 28, 0.55);
+  --shadow-soft: 0 2px 12px rgba(4, 12, 28, 0.35);
+}
+
+:root {
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}

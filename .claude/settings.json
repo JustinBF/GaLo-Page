@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm --prefix \"c:\\\\Users\\\\Usuario\\\\Desktop\\\\GaLo Tabla\\\\frontend\" install react-router-dom 2>&1)",
+      "PowerShell($php=\"C:\\\\laragon\\\\bin\\\\php\\\\php-8.3.30-Win32-vs16-x64\\\\php.exe\"; & $php \"c:\\\\Users\\\\Usuario\\\\Desktop\\\\GaLo Tabla\\\\backend\\\\artisan\" install:api --no-interaction 2>&1 | Select-Object -Last 20)",
+      "PowerShell(composer --working-dir=\"c:\\\\Users\\\\Usuario\\\\Desktop\\\\GaLo Tabla\\\\backend\" require laravel/boost --dev --no-interaction 2>&1)"
+    ]
+  }
+}
