@@ -60,7 +60,12 @@ export function Events() {
       )}
 
       <div className="event-list">
-        {events.map((event) => (
+        {events.map((event) => {
+          // Defensivo: si la API va por detrás del frontend, esta lista no
+          // viene y la tarjeta entera tumbaba la página.
+          const organizers = event.organizers ?? []
+
+          return (
           <article className="event-card" key={event.id}>
             <header className="event-card__head">
               <div>
@@ -119,16 +124,16 @@ export function Events() {
               </div>
               <div className="stat">
                 <span className="stat__label">
-                  {event.organizers.length === 1 ? 'Organizador' : 'Organizadores'}
+                  {organizers.length === 1 ? 'Organizador' : 'Organizadores'}
                 </span>
                 <span className="stat__value">
-                  {event.organizers.length > 0 ? (
+                  {organizers.length > 0 ? (
                     <span className="organizer-list">
-                      {event.organizers.map((organizer) => (
+                      {organizers.map((organizer) => (
                         <span className="cell-member" key={organizer.id}>
                           <Avatar member={organizer} size={24} />
                           {organizer.nick}
-                          {event.organizers.length > 1 && (
+                          {organizers.length > 1 && (
                             <em className="organizer-share">{organizer.co_share} CO</em>
                           )}
                         </span>
@@ -141,9 +146,9 @@ export function Events() {
               </div>
             </div>
 
-            {event.results.length > 0 && (
+            {(event.results ?? []).length > 0 && (
               <div className="event-card__podium">
-                {event.results.map((result) => (
+                {(event.results ?? []).map((result) => (
                   <div className="podium-chip" key={result.position}>
                     <Medal position={result.position} size={22} />
                     <Avatar member={result.member} size={26} />
@@ -156,7 +161,8 @@ export function Events() {
 
             {event.notes && <p className="event-card__notes">{event.notes}</p>}
           </article>
-        ))}
+          )
+        })}
       </div>
 
       {(creating || editing) && (

@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import { ErrorBoundary } from '../ErrorBoundary'
 import { AppHeader } from './AppHeader'
 
 export function AppLayout() {
@@ -6,7 +7,9 @@ export function AppLayout() {
     <div className="app-shell">
       <AppHeader />
       <main className="content">
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
     </div>
   )
