@@ -122,6 +122,8 @@ export interface DuesWeek {
 /** Organizador de un evento, con la parte del CO que le tocó. */
 export interface EventOrganizer extends MemberRef {
   co_share: number
+  /** Su parte del premio: el total dividido entre los organizadores. */
+  prize_share: number
 }
 
 /** Insignia del evento. `position` null = la general, la lucen los tres. */

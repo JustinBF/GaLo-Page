@@ -37,7 +37,7 @@ class Event extends Model
     public function organizers(): BelongsToMany
     {
         return $this->belongsToMany(Member::class, 'event_organizer')
-            ->withPivot('co_share')
+            ->withPivot('co_share', 'prize_share')
             ->withTimestamps();
     }
 

@@ -170,9 +170,14 @@ class EventController extends Controller
         }
 
         $shares = $this->coSplitter->split($event->co_awarded, $organizerIds);
+        // El premio se reparte igual: cada uno puso su parte, no el total.
+        $prizeShares = $this->coSplitter->split($event->prize_value, $organizerIds);
 
         $event->organizers()->sync(
-            collect($shares)->map(fn (int $share) => ['co_share' => $share])->all(),
+            collect($shares)->map(fn (int $share, int $memberId) => [
+                'co_share' => $share,
+                'prize_share' => $prizeShares[$memberId],
+            ])->all(),
         );
 
         $total = count($organizerIds);

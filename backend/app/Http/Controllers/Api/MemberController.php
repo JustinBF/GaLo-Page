@@ -39,9 +39,9 @@ class MemberController extends Controller
                 'results as top1_count' => fn ($q) => $q->where('position', 1),
                 'results as top2_count' => fn ($q) => $q->where('position', 2),
                 'results as top3_count' => fn ($q) => $q->where('position', 3),
-                'organizedEventsShared',
+                'organizerShares',
             ])
-            ->withSum('organizedEventsShared', 'prize_value');
+            ->withSum('organizerShares', 'prize_share');
 
         if ($scope === 'players') {
             $query->where('is_player', true)->orderByDesc('ce_balance');

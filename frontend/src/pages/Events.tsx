@@ -134,7 +134,10 @@ export function Events() {
                           <Avatar member={organizer} size={24} />
                           {organizer.nick}
                           {organizers.length > 1 && (
-                            <em className="organizer-share">{organizer.co_share} CO</em>
+                            <em className="organizer-share">
+                              {organizer.co_share} CO ·{' '}
+                              {formatPokeyen(organizer.prize_share)} ¥
+                            </em>
                           )}
                         </span>
                       ))}

@@ -58,8 +58,18 @@ class Member extends Model
     public function organizedEventsShared(): BelongsToMany
     {
         return $this->belongsToMany(Event::class, 'event_organizer')
-            ->withPivot('co_share')
+            ->withPivot('co_share', 'prize_share')
             ->withTimestamps();
+    }
+
+    /**
+     * Sus filas del pivote. Se agrega sobre esto y no sobre los eventos: el
+     * premio que le toco a cada organizador vive en el pivote, y sumar el
+     * de events contaria el premio entero a cada uno.
+     */
+    public function organizerShares(): HasMany
+    {
+        return $this->hasMany(EventOrganizer::class);
     }
 
     public function duesPayments(): HasMany

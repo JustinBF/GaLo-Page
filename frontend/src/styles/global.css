@@ -722,8 +722,8 @@ select.field__input { cursor: pointer; }
 .rank-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 11px;
+  gap: 7px;
+  padding: 4px 12px;
   border: 1px solid;
   border-radius: var(--radius-pill);
   font-size: 12px;
@@ -737,9 +737,15 @@ select.field__input { cursor: pointer; }
 }
 
 .rank-icon {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
+}
+
+/* En la cabecera del perfil hay sitio de sobra para que se aprecie. */
+.profile-head .rank-icon {
+  width: 32px;
+  height: 32px;
 }
 
 /* ---------- Modales ---------- */

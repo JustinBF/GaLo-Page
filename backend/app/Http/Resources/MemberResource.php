@@ -34,8 +34,9 @@ class MemberResource extends JsonResource
             'top1' => $this->whenNotNull($this->top1_count),
             'top2' => $this->whenNotNull($this->top2_count),
             'top3' => $this->whenNotNull($this->top3_count),
-            'events_organized' => $this->whenNotNull($this->organized_events_shared_count),
-            'prizes_total' => $this->whenNotNull($this->organized_events_shared_sum_prize_value),
+            'events_organized' => $this->whenNotNull($this->organizer_shares_count),
+            // Su parte del premio, no el premio entero de cada evento.
+            'prizes_total' => $this->whenNotNull($this->organizer_shares_sum_prize_share),
 
             'has_avatar' => $this->hasAvatar(),
             'avatar_url' => $this->hasAvatar()
