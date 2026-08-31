@@ -4,6 +4,7 @@ import { redemptionsApi } from '../api/rewards'
 import { formatDate, formatDateTime } from '../lib/format'
 import type { Member, MemberResult, Redemption } from '../types'
 import { Avatar } from './ui/Avatar'
+import { EventBadgeImg } from './ui/EventBadgeImg'
 import { Medal } from './ui/Medal'
 import { Modal } from './ui/Modal'
 import { RankBadge } from './ui/RankBadge'
@@ -35,6 +36,9 @@ export function MemberProfileModal({ member, onClose }: Props) {
       .catch(() => setResults([]))
       .finally(() => setLoadingResults(false))
   }, [member.id])
+
+  // Solo los podios cuyo evento tiene insignia propia.
+  const earnedBadges = results.filter((result) => result.badge !== null)
 
   // Los cancelados no cuentan como premios obtenidos.
   const obtained = redemptions.filter((r) => r.status !== 'cancelado')
@@ -83,6 +87,25 @@ export function MemberProfileModal({ member, onClose }: Props) {
         )}
       </div>
 
+      {member.is_player && earnedBadges.length > 0 && (
+        <>
+          <h3 className="section-title section-title--sm">
+            Insignias ({earnedBadges.length})
+          </h3>
+          <div className="badge-case">
+            {earnedBadges.map((result) => (
+              <EventBadgeImg
+                key={result.event.id}
+                eventId={result.event.id}
+                badge={result.badge!}
+                eventName={result.event.name}
+                size={56}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
       {member.is_player && (
         <>
           <h3 className="section-title section-title--sm">
@@ -98,7 +121,14 @@ export function MemberProfileModal({ member, onClose }: Props) {
           <div className="prize-list">
             {results.map((result) => (
               <div className="prize-item" key={result.event.id}>
-                {result.position <= 3 ? (
+                {result.badge ? (
+                  <EventBadgeImg
+                    eventId={result.event.id}
+                    badge={result.badge}
+                    eventName={result.event.name}
+                    size={40}
+                  />
+                ) : result.position <= 3 ? (
                   <Medal position={result.position} size={34} />
                 ) : (
                   <span className="position-chip">#{result.position}</span>

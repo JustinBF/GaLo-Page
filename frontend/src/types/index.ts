@@ -67,6 +67,11 @@ export interface Single<T> {
   data: T
 }
 
+/** Respuesta que además trae avisos que no impiden guardar. */
+export interface SingleWithWarnings<T> extends Single<T> {
+  warnings: string[]
+}
+
 export type EventType = 'torneo' | 'caza' | 'sorteo' | 'otro'
 export type Difficulty = 'baja' | 'media' | 'alta' | 'extrema'
 
@@ -95,6 +100,34 @@ export interface MemberResult {
     held_at: string | null
     difficulty: Difficulty
   }
+  /** La insignia que luce por este puesto, si el evento tiene. */
+  badge: EventBadge | null
+}
+
+/** Una fila de la tabla de cuotas semanales. */
+export interface DuesRow {
+  member: MemberRef
+  paid: boolean
+  amount: number | null
+  paid_at: string | null
+}
+
+export interface DuesWeek {
+  week_start: string
+  week_end: string
+  default_amount: number
+  rows: DuesRow[]
+}
+
+/** Organizador de un evento, con la parte del CO que le tocó. */
+export interface EventOrganizer extends MemberRef {
+  co_share: number
+}
+
+/** Insignia del evento. `position` null = la general, la lucen los tres. */
+export interface EventBadge {
+  position: number | null
+  version: number | null
 }
 
 export interface Event {
@@ -107,7 +140,8 @@ export interface Event {
   co_awarded: number
   co_manual_override: boolean
   notes: string | null
-  organizer: MemberRef | null
+  organizers: EventOrganizer[]
+  badges: EventBadge[]
   results: EventResult[]
   total_ce_awarded: number
 }
@@ -118,7 +152,7 @@ export interface EventPayload {
   held_at: string
   difficulty: Difficulty
   prize_value: number
-  organizer_id: number | null
+  organizer_ids: number[]
   /** null = aplicar la regla automática de CO. */
   co_awarded: number | null
   notes: string | null

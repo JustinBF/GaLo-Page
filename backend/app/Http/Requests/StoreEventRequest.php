@@ -22,7 +22,9 @@ class StoreEventRequest extends FormRequest
             'difficulty' => ['required', Rule::in(['baja', 'media', 'alta', 'extrema'])],
             // En Pokeyenes crudos: el frontend convierte "1.5m" a 1500000.
             'prize_value' => ['required', 'integer', 'min:0', 'max:999999999999'],
-            'organizer_id' => ['nullable', 'integer', Rule::exists('members', 'id')],
+            // Varios organizadores por evento: el CO se reparte entre ellos.
+            'organizer_ids' => ['array', 'max:10'],
+            'organizer_ids.*' => ['required', 'integer', Rule::exists('members', 'id')],
 
             // Si va a null, se aplica la regla automática de co_rules.
             'co_awarded' => ['nullable', 'integer', 'min:0', 'max:100000'],
@@ -51,6 +53,14 @@ class StoreEventRequest extends FormRequest
                 $members = array_column($results, 'member_id');
                 if (count($members) !== count(array_unique($members))) {
                     $validator->errors()->add('results', 'Un jugador no puede ocupar dos posiciones.');
+                }
+
+                $organizers = $this->input('organizer_ids', []);
+                if (count($organizers) !== count(array_unique($organizers))) {
+                    $validator->errors()->add(
+                        'organizer_ids',
+                        'Hay un organizador repetido.',
+                    );
                 }
             },
         ];

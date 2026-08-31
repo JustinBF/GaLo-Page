@@ -64,7 +64,8 @@ export const api = {
   get: <T>(path: string) => request<T>('GET', path),
   post: <T>(path: string, body?: unknown) => request<T>('POST', path, body),
   put: <T>(path: string, body?: unknown) => request<T>('PUT', path, body),
-  delete: <T>(path: string) => request<T>('DELETE', path),
+  // Con cuerpo opcional: las cuotas identifican el cobro por jugador y semana.
+  delete: <T>(path: string, body?: unknown) => request<T>('DELETE', path, body),
 }
 
 /**
@@ -113,6 +114,18 @@ export function rewardImageUrl(
   version: number | null,
 ): string {
   return `${BASE_URL}/rewards/${rewardId}/image?v=${version ?? 0}`
+}
+
+/**
+ * URL absoluta de la insignia de un evento. `position` null pide la general.
+ */
+export function eventBadgeUrl(
+  eventId: number,
+  position: number | null,
+  version: number | null,
+): string {
+  const slot = position ?? 'general'
+  return `${BASE_URL}/events/${eventId}/badge/${slot}?v=${version ?? 0}`
 }
 
 /** URL absoluta del icono de un rango. */

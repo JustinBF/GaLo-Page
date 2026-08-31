@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\CoRuleController;
 use App\Http\Controllers\Api\CreditController;
+use App\Http\Controllers\Api\DuesController;
+use App\Http\Controllers\Api\EventBadgeController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\PodiumController;
@@ -24,6 +26,8 @@ Route::get('/rewards/{reward}/image', [RewardController::class, 'image'])
     ->name('rewards.image');
 Route::get('/ranks/{rank}/icon', [RankController::class, 'icon'])
     ->name('ranks.icon');
+Route::get('/events/{event}/badge/{position}', [EventBadgeController::class, 'show'])
+    ->name('events.badge');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
@@ -49,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/rewards/{reward}', [RewardController::class, 'show']);
     Route::get('/redemptions', [RedemptionController::class, 'index']);
     Route::get('/podium', [PodiumController::class, 'index']);
+    Route::get('/dues', [DuesController::class, 'index']);
 
     // Escritura: solo admin.
     Route::middleware(EnsureAdmin::class)->prefix('admin')->group(function () {
@@ -69,6 +74,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/events', [EventController::class, 'store']);
         Route::put('/events/{event}', [EventController::class, 'update']);
         Route::delete('/events/{event}', [EventController::class, 'destroy']);
+
+        Route::post('/dues', [DuesController::class, 'store']);
+        Route::delete('/dues', [DuesController::class, 'destroy']);
+        Route::put('/dues/amount', [DuesController::class, 'updateAmount']);
+
+        Route::post('/events/{event}/badge', [EventBadgeController::class, 'upload']);
+        Route::delete('/events/{event}/badge/{position}', [EventBadgeController::class, 'destroy']);
 
         Route::post('/co-rules', [CoRuleController::class, 'store']);
         Route::put('/co-rules/{coRule}', [CoRuleController::class, 'update']);

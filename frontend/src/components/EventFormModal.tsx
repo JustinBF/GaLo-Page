@@ -4,6 +4,7 @@ import { eventsApi } from '../api/events'
 import { useMembers } from '../api/members'
 import { formatPokeyen, parsePokeyen } from '../lib/format'
 import type { Difficulty, Event, EventPayload, EventType } from '../types'
+import { EventBadgesField } from './EventBadgesField'
 import { Medal } from './ui/Medal'
 import { Modal } from './ui/Modal'
 
@@ -68,8 +69,8 @@ export function EventFormModal({ event, onClose, onSaved }: Props) {
   const [prize, setPrize] = useState(
     event ? String(event.prize_value) : '',
   )
-  const [organizerId, setOrganizerId] = useState(
-    event?.organizer?.id ? String(event.organizer.id) : '',
+  const [organizerIds, setOrganizerIds] = useState<number[]>(
+    event?.organizers?.map((organizer) => organizer.id) ?? [],
   )
   const [manualCo, setManualCo] = useState(event?.co_manual_override ?? false)
   const [co, setCo] = useState(event ? String(event.co_awarded) : '0')
@@ -78,6 +79,17 @@ export function EventFormModal({ event, onClose, onSaved }: Props) {
   const [notes, setNotes] = useState(event?.notes ?? '')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+
+  // Mismo reparto que CoSplitter en el backend: division entera y el resto
+  // de uno en uno a los primeros, para que las partes sumen el total.
+  const totalCo = manualCo ? Number(co || 0) : (suggestedCo ?? 0)
+  const coSplitPreview = organizerIds
+    .map((_, index) => {
+      const base = Math.floor(totalCo / organizerIds.length)
+      const remainder = totalCo - base * organizerIds.length
+      return base + (index < remainder ? 1 : 0)
+    })
+    .join(' + ')
 
   const prizeValue = parsePokeyen(prize)
 
@@ -149,7 +161,7 @@ export function EventFormModal({ event, onClose, onSaved }: Props) {
       held_at: heldAt,
       difficulty,
       prize_value: prizeValue,
-      organizer_id: organizerId ? Number(organizerId) : null,
+      organizer_ids: organizerIds,
       co_awarded: manualCo ? Number(co || 0) : null,
       notes: notes.trim() || null,
       results,
@@ -157,11 +169,15 @@ export function EventFormModal({ event, onClose, onSaved }: Props) {
 
     setSaving(true)
     try {
-      if (event) {
-        await eventsApi.update(event.id, payload)
-      } else {
-        await eventsApi.create(payload)
+      const saved = event
+        ? await eventsApi.update(event.id, payload)
+        : await eventsApi.create(payload)
+
+      // El evento se guarda igual: la cuota pendiente es un aviso, no un veto.
+      if (saved.warnings?.length) {
+        alert(saved.warnings.join('\n'))
       }
+
       onSaved()
       onClose()
     } catch (err) {
@@ -272,22 +288,33 @@ export function EventFormModal({ event, onClose, onSaved }: Props) {
           </div>
 
           <div className="field">
-            <label className="field__label" htmlFor="ev-org">
-              Organizador
-            </label>
-            <select
-              id="ev-org"
-              className="field__input"
-              value={organizerId}
-              onChange={(e) => setOrganizerId(e.target.value)}
-            >
-              <option value="">Sin organizador</option>
+            <span className="field__label">Organizadores</span>
+            <div className="organizer-picker">
+              {organizers.length === 0 && (
+                <p className="panel__hint">No hay organizadores dados de alta.</p>
+              )}
               {organizers.map((member) => (
-                <option key={member.id} value={member.id}>
+                <label className="organizer-pick" key={member.id}>
+                  <input
+                    type="checkbox"
+                    checked={organizerIds.includes(member.id)}
+                    onChange={(e) =>
+                      setOrganizerIds((current) =>
+                        e.target.checked
+                          ? [...current, member.id]
+                          : current.filter((id) => id !== member.id),
+                      )
+                    }
+                  />
                   {member.nick}
-                </option>
+                </label>
               ))}
-            </select>
+            </div>
+            {organizerIds.length > 1 && (
+              <p className="field__hint">
+                El CO se reparte entre {organizerIds.length}: {coSplitPreview}
+              </p>
+            )}
           </div>
         </div>
 
@@ -365,6 +392,8 @@ export function EventFormModal({ event, onClose, onSaved }: Props) {
             </div>
           ))}
         </div>
+
+        {event && <EventBadgesField event={event} />}
 
         <div className="field">
           <label className="field__label" htmlFor="ev-notes">

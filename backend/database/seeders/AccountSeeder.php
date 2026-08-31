@@ -32,9 +32,17 @@ class AccountSeeder extends Seeder
             ],
         );
 
-        // Indicador informativo de la barra superior. El Banco del Team se
-        // gestiona fuera de la web; aquí solo se muestra la cifra.
-        Setting::put('bank_balance', ['amount' => 0, 'currency' => 'pokeyenes']);
-        Setting::put('team_name', ['value' => 'GaLo']);
+        // Solo la primera vez: el seeder corre en cada despliegue y estos
+        // valores los edita el admin desde la web. Con put() se perderia el
+        // nombre del team en cada deploy.
+        Setting::firstOrCreate(
+            ['key' => 'team_name'],
+            ['value' => ['value' => 'GaLo']],
+        );
+
+        Setting::firstOrCreate(
+            ['key' => 'dues_amount'],
+            ['value' => ['amount' => 0]],
+        );
     }
 }

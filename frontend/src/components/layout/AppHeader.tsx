@@ -21,6 +21,7 @@ const LINKS = [
   { to: '/organizadores', label: 'Créditos CO', icon: iconOrganizador },
   { to: '/eventos', label: 'Eventos', icon: iconEventos },
   { to: '/tienda', label: 'Tienda', icon: iconTienda },
+  { to: '/cuotas', label: 'Cuotas', icon: iconJugador },
 ]
 
 export function AppHeader() {

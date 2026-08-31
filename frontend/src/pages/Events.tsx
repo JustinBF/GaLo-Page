@@ -118,12 +118,21 @@ export function Events() {
                 <span className="stat__value stat__value--co">{event.co_awarded}</span>
               </div>
               <div className="stat">
-                <span className="stat__label">Organizador</span>
+                <span className="stat__label">
+                  {event.organizers.length === 1 ? 'Organizador' : 'Organizadores'}
+                </span>
                 <span className="stat__value">
-                  {event.organizer ? (
-                    <span className="cell-member">
-                      <Avatar member={event.organizer} size={24} />
-                      {event.organizer.nick}
+                  {event.organizers.length > 0 ? (
+                    <span className="organizer-list">
+                      {event.organizers.map((organizer) => (
+                        <span className="cell-member" key={organizer.id}>
+                          <Avatar member={organizer} size={24} />
+                          {organizer.nick}
+                          {event.organizers.length > 1 && (
+                            <em className="organizer-share">{organizer.co_share} CO</em>
+                          )}
+                        </span>
+                      ))}
                     </span>
                   ) : (
                     <span style={{ color: 'var(--text-dim)' }}>—</span>

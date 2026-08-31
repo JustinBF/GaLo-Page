@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Member extends Model
@@ -51,6 +52,19 @@ class Member extends Model
     public function organizedEvents(): HasMany
     {
         return $this->hasMany(Event::class, 'organizer_id');
+    }
+
+    /** Eventos que ha organizado, ya sea solo o acompanado. */
+    public function organizedEventsShared(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class, 'event_organizer')
+            ->withPivot('co_share')
+            ->withTimestamps();
+    }
+
+    public function duesPayments(): HasMany
+    {
+        return $this->hasMany(DuesPayment::class);
     }
 
     public function redemptions(): HasMany

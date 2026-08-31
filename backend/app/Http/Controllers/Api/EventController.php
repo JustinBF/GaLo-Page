@@ -10,7 +10,9 @@ use App\Models\AuditLog;
 use App\Models\Event;
 use App\Models\Member;
 use App\Services\CoCalculator;
+use App\Services\CoSplitter;
 use App\Services\CreditService;
+use App\Services\DuesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -20,13 +22,15 @@ class EventController extends Controller
 {
     public function __construct(
         private readonly CoCalculator $coCalculator,
+        private readonly CoSplitter $coSplitter,
         private readonly CreditService $credits,
+        private readonly DuesService $dues,
     ) {}
 
     public function index(): AnonymousResourceCollection
     {
         $events = Event::query()
-            ->with(['organizer', 'results.member'])
+            ->with(['organizers', 'badges', 'results.member'])
             ->orderByDesc('held_at')
             ->orderByDesc('id')
             ->get();
@@ -36,7 +40,7 @@ class EventController extends Controller
 
     public function show(Event $event): EventResource
     {
-        return new EventResource($event->load(['organizer', 'results.member']));
+        return new EventResource($event->load(['organizers', 'badges', 'results.member']));
     }
 
     /**
@@ -62,7 +66,8 @@ class EventController extends Controller
 
         $this->audit($request, 'event.create', $event, $request->validated());
 
-        return (new EventResource($event->load(['organizer', 'results.member'])))
+        return (new EventResource($event->load(['organizers', 'badges', 'results.member'])))
+            ->additional(['warnings' => $this->duesWarnings($event)])
             ->response()
             ->setStatusCode(201);
     }
@@ -75,7 +80,8 @@ class EventController extends Controller
 
         $this->audit($request, 'event.update', $updated, $request->validated());
 
-        return new EventResource($updated->load(['organizer', 'results.member']));
+        return (new EventResource($updated->load(['organizers', 'badges', 'results.member'])))
+            ->additional(['warnings' => $this->duesWarnings($updated)]);
     }
 
     /**
@@ -110,7 +116,6 @@ class EventController extends Controller
             'held_at' => $data['held_at'],
             'difficulty' => $data['difficulty'],
             'prize_value' => $data['prize_value'],
-            'organizer_id' => $data['organizer_id'] ?? null,
             'notes' => $data['notes'] ?? null,
             'co_manual_override' => $manualCo,
             'co_awarded' => $manualCo
@@ -144,19 +149,76 @@ class EventController extends Controller
             }
         }
 
-        if ($event->organizer_id && $event->co_awarded !== 0) {
+        $this->syncOrganizers($event, $data['organizer_ids'] ?? [], $userId);
+
+        return $event->fresh();
+    }
+
+    /**
+     * Reparte el CO entre los organizadores y guarda la parte de cada uno.
+     *
+     * @param  list<int>  $organizerIds
+     */
+    private function syncOrganizers(Event $event, array $organizerIds, int $userId): void
+    {
+        $organizerIds = array_values(array_unique(array_map('intval', $organizerIds)));
+
+        if ($organizerIds === []) {
+            $event->organizers()->detach();
+
+            return;
+        }
+
+        $shares = $this->coSplitter->split($event->co_awarded, $organizerIds);
+
+        $event->organizers()->sync(
+            collect($shares)->map(fn (int $share) => ['co_share' => $share])->all(),
+        );
+
+        $total = count($organizerIds);
+
+        foreach ($shares as $memberId => $share) {
+            if ($share === 0) {
+                continue;
+            }
+
+            $note = $total > 1
+                ? "Organizó {$event->name} (reparto entre {$total})"
+                : "Organizó {$event->name}";
+
             $this->credits->post(
-                member: Member::findOrFail($event->organizer_id),
+                member: Member::findOrFail($memberId),
                 currency: 'CO',
-                amount: $event->co_awarded,
+                amount: $share,
                 reason: 'event_organized',
                 userId: $userId,
-                note: "Organizó {$event->name}",
+                note: $note,
                 eventId: $event->id,
             );
         }
+    }
 
-        return $event->fresh();
+    /**
+     * Avisa si algun participante no tiene la cuota de esta semana al dia.
+     *
+     * Es solo un aviso: el admin decide. Bloquear la escritura impediria
+     * corregir eventos antiguos.
+     *
+     * @return list<string>
+     */
+    private function duesWarnings(Event $event): array
+    {
+        $memberIds = $event->results()->pluck('member_id')->all();
+
+        $unpaid = $this->dues->unpaidAmong($memberIds);
+
+        if ($unpaid === []) {
+            return [];
+        }
+
+        $nicks = Member::whereIn('id', $unpaid)->pluck('nick')->implode(', ');
+
+        return ["Con la cuota de esta semana pendiente: {$nicks}."];
     }
 
     private function audit(

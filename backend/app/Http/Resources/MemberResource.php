@@ -34,8 +34,8 @@ class MemberResource extends JsonResource
             'top1' => $this->whenNotNull($this->top1_count),
             'top2' => $this->whenNotNull($this->top2_count),
             'top3' => $this->whenNotNull($this->top3_count),
-            'events_organized' => $this->whenNotNull($this->organized_events_count),
-            'prizes_total' => $this->whenNotNull($this->organized_events_sum_prize_value),
+            'events_organized' => $this->whenNotNull($this->organized_events_shared_count),
+            'prizes_total' => $this->whenNotNull($this->organized_events_shared_sum_prize_value),
 
             'has_avatar' => $this->hasAvatar(),
             'avatar_url' => $this->hasAvatar()
@@ -58,6 +58,9 @@ class MemberResource extends JsonResource
             'slug' => $rank->slug,
             'level' => $rank->level,
             'color_hex' => $rank->color_hex,
+            // Sin esto el badge nunca pinta el icono subido por el admin.
+            'has_icon' => $rank->icon_mime !== null,
+            'icon_version' => $rank->updated_at?->timestamp,
         ];
     }
 }

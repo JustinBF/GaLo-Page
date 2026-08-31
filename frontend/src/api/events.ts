@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api } from './client'
-import type { Collection, CreditTransaction, Event, EventPayload, Single } from '../types'
+import { api, uploadFile } from './client'
+import type {
+  Collection,
+  CreditTransaction,
+  Event,
+  EventPayload,
+  SingleWithWarnings,
+} from '../types'
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([])
@@ -28,12 +34,26 @@ export function useEvents() {
 }
 
 export const eventsApi = {
-  create: (payload: EventPayload) => api.post<Single<Event>>('/admin/events', payload),
+  create: (payload: EventPayload) =>
+    api.post<SingleWithWarnings<Event>>('/admin/events', payload),
 
   update: (id: number, payload: EventPayload) =>
-    api.put<Single<Event>>(`/admin/events/${id}`, payload),
+    api.put<SingleWithWarnings<Event>>(`/admin/events/${id}`, payload),
 
   remove: (id: number) => api.delete(`/admin/events/${id}`),
+
+  /** Insignia del evento. `position` null = la general del evento. */
+  uploadBadge: (id: number, file: File, position: number | null) => {
+    const body = new FormData()
+    body.append('badge', file)
+    if (position !== null) {
+      body.append('position', String(position))
+    }
+    return uploadFile<{ message: string }>(`/admin/events/${id}/badge`, body)
+  },
+
+  removeBadge: (id: number, position: number | null) =>
+    api.delete(`/admin/events/${id}/badge/${position ?? 'general'}`),
 
   /** Consulta el CO que corresponde a un premio según las reglas vigentes. */
   suggestCo: (prizeValue: number) =>

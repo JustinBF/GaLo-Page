@@ -25,6 +25,15 @@ class MemberResultResource extends JsonResource
                 'held_at' => $this->event->held_at?->toDateString(),
                 'difficulty' => $this->event->difficulty,
             ],
+
+            // La insignia que luce por este puesto, si el evento tiene una.
+            'badge' => $this->when(
+                $this->event->relationLoaded('badges'),
+                fn () => ($badge = $this->event->badgeFor($this->position)) ? [
+                    'position' => $badge->position,
+                    'version' => $badge->updated_at?->timestamp,
+                ] : null,
+            ),
         ];
     }
 }

@@ -24,15 +24,23 @@ class EventResource extends JsonResource
             'co_manual_override' => $this->co_manual_override,
             'notes' => $this->notes,
 
-            'organizer' => $this->whenLoaded(
-                'organizer',
-                fn () => $this->organizer ? [
-                    'id' => $this->organizer->id,
-                    'nick' => $this->organizer->nick,
-                    'has_avatar' => $this->organizer->hasAvatar(),
-                    'avatar_version' => $this->organizer->updated_at?->timestamp,
-                ] : null,
-            ),
+            'organizers' => $this->whenLoaded('organizers', fn () => $this->organizers->map(
+                fn ($organizer) => [
+                    'id' => $organizer->id,
+                    'nick' => $organizer->nick,
+                    'co_share' => $organizer->pivot->co_share,
+                    'has_avatar' => $organizer->hasAvatar(),
+                    'avatar_version' => $organizer->updated_at?->timestamp,
+                ],
+            )),
+
+            // position null = insignia general del evento.
+            'badges' => $this->whenLoaded('badges', fn () => $this->badges->map(
+                fn ($badge) => [
+                    'position' => $badge->position,
+                    'version' => $badge->updated_at?->timestamp,
+                ],
+            )),
 
             'results' => $this->whenLoaded('results', fn () => $this->results->map(
                 fn ($result) => [

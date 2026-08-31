@@ -3,6 +3,7 @@ import { AppLayout } from './components/layout/AppLayout'
 import { AuthProvider } from './auth/AuthContext'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { Dashboard } from './pages/Dashboard'
+import { Dues } from './pages/Dues'
 import { Events } from './pages/Events'
 import { Login } from './pages/Login'
 import { OrganizersTable } from './pages/OrganizersTable'
@@ -26,6 +27,7 @@ export default function App() {
                 <Route path="/organizadores" element={<OrganizersTable />} />
                 <Route path="/eventos" element={<Events />} />
                 <Route path="/tienda" element={<Shop />} />
+                <Route path="/cuotas" element={<Dues />} />
                 <Route path="/ajustes" element={<Settings />} />
               </Route>
             </Route>
